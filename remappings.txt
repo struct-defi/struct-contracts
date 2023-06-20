@@ -1,0 +1,9 @@
+@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/
+@chainlink/=lib/chainlink/
+@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/
+ds-test/=lib/forge-std/lib/ds-test/src/
+forge-std/=lib/forge-std/
+@interfaces/=contracts/interfaces/
+@core/=contracts/protocol/
+@mocks/=contracts/mocks/
+@external/=contracts/external/

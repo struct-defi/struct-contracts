@@ -1,0 +1,32 @@
+name: Code Coverage
+
+on: [workflow_dispatch]
+
+jobs:
+    coverage:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 16.x
+
+            - name: Cache Dependencies
+              id: cache
+              uses: actions/cache@v3
+              with:
+                  path: ./node_modules
+                  key: coverage-${{ hashFiles('package-lock.json') }}
+
+            - name: Install Dependencies
+              if: steps.cache.outputs.cache-hit != 'true'
+              run: npm install
+
+            - name: Run Code Coverage
+              run: npm run coverage
+
+            - name: Coveralls
+              uses: coverallsapp/github-action@master
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}

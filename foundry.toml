@@ -1,0 +1,15 @@
+[profile.default]
+src = 'contracts'
+out = 'build'
+libs = ['lib']
+optimizer = true
+optimizer_runs = 1
+via_ir = false
+auto_detect_solc=true
+
+[fuzz]
+runs = 512
+
+[rpc_endpoints]
+fuji = "${FUJI_RPC}"
+avax_cchain = "${MAINNET_RPC}"

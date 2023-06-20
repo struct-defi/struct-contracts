@@ -1,0 +1,54 @@
+{
+  "name": "struct-contracts",
+  "version": "1.2.3",
+  "author": "Struct Finance",
+  "homepage": "https://struct.fi",
+  "contributors": [
+    "Pranesh A S <pranesh@struct.fi>",
+    "Rhinestone Cowboy <rhinestonecowboy@struct.fi>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "struct",
+    "struct-finance",
+    "defi",
+    "ethereum",
+    "solidity"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/struct-defi/struct-contracts"
+  },
+  "scripts": {
+    "compile": "forge build",
+    "gen:typechain": "npm run compile && npx typechain --target ethers-v6 --out-dir typechain-types './build/**/*.json'",
+    "format-sol": "./utils/format-staged-contracts.sh",
+    "solhint": "./node_modules/.bin/solhint -f table contracts/**/*.sol",
+    "commit": "./node_modules/cz-customizable/standalone.js",
+    "prepare": "husky install",
+    "forge:unit-tests": "forge test -vv --no-match-contract ForkTest",
+    "forge:coverage:ci": "forge coverage --report lcov",
+    "forge:fork-tests": "forge test -vv --match-contract ForkTest",
+    "deploy:fuji:gmx": "forge script scripts/gmx/Deploy.s.sol:Deploy --rpc-url https://api.avax-test.network/ext/bc/C/rpc --broadcast",
+    "deploy:avax-cchain:gmx": "cross-env forge script contracts/scripts/gmx/Deploy.s.sol:Deploy --rpc-url https://api.avax.network/ext/bc/C/rpc --broadcast --slow",
+    "publish:abi": "npx ts-node utils/publishABI.ts"
+  },
+  "devDependencies": {
+    "@typechain/ethers-v6": "0.4.0",
+    "cz-conventional-changelog": "3.3.0",
+    "cz-customizable": "7.0.0",
+    "dotenv": "16.0.3",
+    "ethers": "6.4.1",
+    "husky": "8.0.1",
+    "simple-git": "3.15.1",
+    "solhint": "3.3.7",
+    "ts-node": "10.9.1",
+    "typechain": "8.2.0",
+    "typescript": "4.8.4"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
