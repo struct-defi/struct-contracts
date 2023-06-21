@@ -1,4 +1,4 @@
-# Struct Protocol  •  ![Unit Tests](https://github.com/struct-defi/struct-core/actions/workflows/tests-unit.yml/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/struct-defi/struct-core/badge.svg?branch=develop&t=OAl3wl)](https://coveralls.io/github/struct-defi/struct-core?branch=develop) [![built-with foundry](https://img.shields.io/badge/built%20with-Foundry-3677FF)](https://book.getfoundry.sh/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# Struct Protocol  •  ![Unit Tests](https://github.com/struct-defi/struct-core/actions/workflows/tests-unit.yml/badge.svg) [![codecov](https://codecov.io/gh/struct-defi/struct-core/branch/develop/graph/badge.svg?token=0MAMOSBMKI)](https://codecov.io/gh/struct-defi/struct-core) [![built-with foundry](https://img.shields.io/badge/built%20with-Foundry-3677FF)](https://book.getfoundry.sh/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
 <br>
