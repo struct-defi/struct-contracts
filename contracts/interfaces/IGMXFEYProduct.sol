@@ -10,10 +10,8 @@ import "./IGAC.sol";
 import "./IStructPriceOracle.sol";
 
 /**
- * @title The Interim GMX FEYProduct Interface
+ * @title The GMX FEYProduct Interface
  * @author Struct Finance
- * @dev This is a temporary interface while we add functionality to the GMX product contract
- * @dev Once the contract is finished, we will use IFEYProduct
  *
  */
 interface IGMXFEYProduct {
