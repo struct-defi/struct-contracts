@@ -30,8 +30,7 @@
     "forge:coverage:ci": "forge coverage --report lcov",
     "forge:fork-tests": "forge test -vv --match-contract ForkTest",
     "deploy:fuji:gmx": "forge script scripts/gmx/Deploy.s.sol:Deploy --rpc-url https://api.avax-test.network/ext/bc/C/rpc --broadcast",
-    "deploy:avax-cchain:gmx": "cross-env forge script contracts/scripts/gmx/Deploy.s.sol:Deploy --rpc-url https://api.avax.network/ext/bc/C/rpc --broadcast --slow",
-    "publish:abi": "npx ts-node utils/publishABI.ts"
+    "deploy:avax-cchain:gmx": "cross-env forge script scripts/gmx/Deploy.s.sol:Deploy --rpc-url https://api.avax.network/ext/bc/C/rpc --broadcast --slow"
   },
   "devDependencies": {
     "@typechain/ethers-v6": "0.4.0",
