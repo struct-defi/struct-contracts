@@ -179,6 +179,14 @@ Configure the contracts to deploy by adding or removing the values for the follo
 To deploy the entire GMX contract suite to AVAX C-Chain:
 `npm run deploy:avax-cchain:gmx`
 
+## Contributing
+The contribution guide can be found in the [contribution readme](CONTRIBUTION.md).
+
+## Code of Conduct
+In order to ensure that the Struct Finance community is welcoming to all, please review and abide by the [Code of Conduct](CONTRIBUTION.md).
+
 ## Questions & Feedback
 
-Please direct any questions or feedback to [development@struct.fi](mailto:development@struct.fi).
+Please direct any questions or feedback to;
+- [Twitter](https://twitter.com/StructFinance)
+- [Discord](https://discord.com/invite/MHMacHCFZp)
