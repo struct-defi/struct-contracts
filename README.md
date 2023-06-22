@@ -1,5 +1,8 @@
 # Struct Protocol  •  ![Unit Tests](https://github.com/struct-defi/struct-core/actions/workflows/tests-unit.yml/badge.svg) [![codecov](https://codecov.io/gh/struct-defi/struct-core/branch/develop/graph/badge.svg?token=0MAMOSBMKI)](https://codecov.io/gh/struct-defi/struct-core) [![built-with foundry](https://img.shields.io/badge/built%20with-Foundry-3677FF)](https://book.getfoundry.sh/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+[![Website](https://img.shields.io/badge/website-000000?style=for-the-badge&logo=CodeSandbox&logoColor=white)](https://struct.fi/)  [![Discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/invite/MHMacHCFZp)  [![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/structfinance)
+
+
 
 <br>
 
