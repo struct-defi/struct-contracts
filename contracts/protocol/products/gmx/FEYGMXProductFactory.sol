@@ -183,7 +183,7 @@ contract FEYGMXProductFactory is IFEYFactory, GACManaged {
      * @param _configTrancheSr Configuration of the senior tranche
      * @param _configTrancheJr Configuration of the junior tranche
      * @param _productConfigUserInput User-set configuration of the Product
-     * @param _tranche The tranche into which the creater makes the initial deposit
+     * @param _tranche The tranche into which the creature makes the initial deposit
      * @param _initialDepositAmount The initial deposit amount
      */
     function createProduct(

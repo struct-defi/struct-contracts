@@ -163,7 +163,7 @@ contract FEYGMXProduct is IGMXFEYProduct, CustomReentrancyGuard, GACManaged, Tra
      * @dev Assets will be held by the contract until the predetermined investment start time.
      * @param _tranche The tranche into which the assets should be deposited
      * @param _amount The amount of tokens that needs to be deposited into the tranche
-     * @param _onBehalfOf The address of the beneficiary wallet that should recieve StructSPToken
+     * @param _onBehalfOf The address of the beneficiary wallet that should receive StructSPToken
      */
     function depositFor(DataTypes.Tranche _tranche, uint256 _amount, address _onBehalfOf)
         external

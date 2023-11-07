@@ -31,7 +31,7 @@ interface IFEYFactory {
     /// @dev Emitted when a LP is whitelised
     event PoolStatusUpdated(address indexed lpAddress, uint256 status, address indexed tokenA, address indexed tokenB);
 
-    /// @dev Emitted when the FEYProduct implementaion is updated
+    /// @dev Emitted when the FEYProduct implementation is updated
     event FEYProductImplementationUpdated(address indexed oldImplementation, address indexed newImplementation);
 
     /// @dev The following events are emitted when respective setter methods are invoked
