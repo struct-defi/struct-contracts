@@ -49,7 +49,7 @@ library Errors {
     string public constant VE_DEPOSITS_NOT_STARTED = "18"; // `Deposits are not started yet`
     string public constant VE_AMOUNT_EXCEEDS_CAP = "19"; // `Trying to deposit more than the max capacity of the tranche`
     string public constant VE_INSUFFICIENT_BAL = "20"; // `Insufficient token balance`
-    string public constant VE_INSUFFICIENT_ALLOWANCE = "21"; // `Insufficent token allowance`
+    string public constant VE_INSUFFICIENT_ALLOWANCE = "21"; // `Insufficient token allowance`
     string public constant VE_INVALID_STATE = "22";
     /// "Invalid current state for the operation"
     string public constant VE_TRANCHE_NOT_STARTED = "23";

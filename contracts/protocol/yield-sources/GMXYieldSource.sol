@@ -225,7 +225,7 @@ contract GMXYieldSource is IGMXYieldSource, GACManaged, CustomReentrancyGuard {
     /// @dev Any wAVAX that is in the balance of the contract before this function is called,
     ///      will be converted into GLP tokens and assigned as new shares to the product
     ///      that we would like to incentivize or subsidize
-    /// @param _products Array of product addresses that we wanna distrubute rewards to
+    /// @param _products Array of product addresses that we wanna distribute rewards to
     /// @param _amount The amount of wAVAX to be distributed.
     /// @custom:note wAVAX should be sent to the contract before calling this method.
     function addRewards(address[] memory _products, uint256 _amount) external onlyRole(GOVERNANCE) {
@@ -396,7 +396,7 @@ contract GMXYieldSource is IGMXYieldSource, GACManaged, CustomReentrancyGuard {
      * @param _amount The token amount used to purchase the GLP tokens
      * @param _tokenPriceUSD The price of the token in USD
      * @param _maximize Flag indicating buy or sell action
-     * @return amountOut The expected fsGLP to be recieved
+     * @return amountOut The expected fsGLP to be received
      */
     function _calculateGLPAmountOutForToken(uint256 _amount, uint256 _tokenPriceUSD, bool _maximize)
         internal
@@ -410,7 +410,7 @@ contract GMXYieldSource is IGMXYieldSource, GACManaged, CustomReentrancyGuard {
      * @notice Returns the `minOut` value for selling GLP for the given token
      * @param _amountfsGlp The amount of fsGlp tokens to be redeemed
      * @param _token The address of the token
-     * @return amountOut The expected tokens to be recieved
+     * @return amountOut The expected tokens to be received
      */
     function _calculateTokenAmountOutForFsGLP(uint256 _amountfsGlp, address _token, uint256 _tokenDecimals)
         internal
