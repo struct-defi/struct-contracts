@@ -1,5 +1,5 @@
 /**
- * ██████████████████████████████████████████████████
+ *                 ██████████████████████████████████████████████████
  *                 ███████████████████████▀░░▀███████████████████████
  *                 ███████████████████▀▀░░░░░░░░▀▀███████████████████
  *                 █████████████████░░░░▄▄████▄▄░░░▐▀████████████████
@@ -40,8 +40,7 @@ import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IER
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /// Internal Imports
-import {IGMXVault} from "../../../external/gmx/IGMXVault.sol";
-import {IGMXYieldSource} from "../../../interfaces/IGMXYieldSource.sol";
+import {IAutoPoolYieldSource} from "../../../interfaces/IAutoPoolYieldSource.sol";
 import {IFEYProduct} from "../../../interfaces/IFEYProduct.sol";
 import {IFEYFactory} from "../../../interfaces/IFEYFactory.sol";
 import {ISPToken} from "../../../interfaces/ISPToken.sol";
@@ -53,16 +52,17 @@ import {DataTypes} from "../../libraries/types/DataTypes.sol";
 import {Constants} from "../../libraries/helpers/Constants.sol";
 import {Errors} from "../../libraries/helpers/Errors.sol";
 import {WadMath} from "../../../utils/WadMath.sol";
+import {IAutoPoolVault} from "../../../external/traderjoe/IAutoPoolVault.sol";
+
 import {FEYFactoryConfigurator} from "../FEYFactoryConfigurator.sol";
 
 /**
- * @title Fixed and Enhanced Yield Product Factory to create FEYGMX Products
- * @notice Factory contract that is used to create Fixed and Enhanced Yield Products
- *
+ * @title Fixed and Enhanced Yield Product Factory Contract
+ * @notice Factory contract that is used to create Fixed and Enhanced Yield AutoPool Products
  * @author Struct Finance
- *
  */
-contract FEYGMXProductFactory is IFEYFactory, FEYFactoryConfigurator {
+
+contract FEYAutoPoolProductFactory is FEYFactoryConfigurator, IFEYFactory {
     using WadMath for uint256;
     using SafeERC20 for IERC20Metadata;
 
@@ -81,8 +81,8 @@ contract FEYGMXProductFactory is IFEYFactory, FEYFactoryConfigurator {
     /// @dev Active pairs
     mapping(address => mapping(address => uint256)) public isPoolActive;
 
-    /// @dev GMX vault address
-    IGMXVault public constant GMX_VAULT = IGMXVault(0x9ab2De34A33fB459b538c43f251eB825645e8595);
+    /// @dev Vaults mapping for reverse loopup
+    mapping(address => mapping(address => address)) public autoPoolVaults;
 
     /// @dev TokenID => Product
     mapping(uint256 => address) public productTokenId;
@@ -90,8 +90,8 @@ contract FEYGMXProductFactory is IFEYFactory, FEYFactoryConfigurator {
     /// @dev List of addresses of all the FEYProducts created
     address[] public allProducts;
 
-    /// @dev GLP YieldSource contract
-    IGMXYieldSource public yieldSource;
+    /// @dev AutoPoool vault => YieldSource
+    mapping(address => IAutoPoolYieldSource) public yieldSources;
 
     /**
      * @notice Initializes the Factory based on the given parameter
@@ -175,18 +175,6 @@ contract FEYGMXProductFactory is IFEYFactory, FEYFactoryConfigurator {
             _validateProductConfig(_productConfig);
 
             _newProduct = _deployProduct(_configTrancheSr, _configTrancheJr, _productConfig);
-
-            DataTypes.FEYGMXProductInfo memory feyGmxProductInfo = DataTypes.FEYGMXProductInfo({
-                tokenA: address(_configTrancheSr.tokenAddress),
-                tokenADecimals: uint8(_configTrancheSr.tokenAddress.decimals()),
-                tokenB: address(_configTrancheJr.tokenAddress),
-                tokenBDecimals: uint8(_configTrancheJr.tokenAddress.decimals()),
-                fsGLPReceived: 0,
-                shares: 0,
-                sameToken: address(_configTrancheSr.tokenAddress) == address(_configTrancheJr.tokenAddress)
-            });
-
-            yieldSource.setFEYGMXProductInfo(_newProduct, feyGmxProductInfo);
         }
 
         {
@@ -207,11 +195,54 @@ contract FEYGMXProductFactory is IFEYFactory, FEYFactoryConfigurator {
             );
         }
 
-        if (_initialDepositValueUSD >= minimumInitialDepositUSD) {
+        if (_initialDepositValueUSD > 0) {
             _makeInitialDeposit(
                 _tranche, _initialDepositAmount, IERC20Metadata(_trancheToken), IFEYProduct(_newProduct)
             );
         }
+    }
+
+    /**
+     * @notice Used to update the status of pair
+     * @param _autoPoolVault The addresss of the autopool vault contract
+     * @param _status The status of the pair
+     */
+    function setPoolStatus(address _autoPoolVault, uint256 _status) external onlyRole(GOVERNANCE) {
+        require(_status == TRUE || _status == FALSE, Errors.VE_INVALID_STATUS);
+
+        address _token0 = IAutoPoolVault(_autoPoolVault).getTokenX();
+        address _token1 = IAutoPoolVault(_autoPoolVault).getTokenY();
+
+        isPoolActive[_token0][_token1] = _status;
+        isPoolActive[_token1][_token0] = _status;
+
+        autoPoolVaults[_token0][_token1] = _autoPoolVault;
+        autoPoolVaults[_token1][_token0] = _autoPoolVault;
+        emit PoolStatusUpdated(_autoPoolVault, _status, _token0, _token1);
+    }
+
+    /**
+     * @notice Sets yield-source contract address for the AutoPool vault
+     * @param _autoPoolVault Address of the AutoPool Vault contract
+     * @param _yieldSource Address of the yield source contract
+     */
+    function setYieldSource(address _autoPoolVault, address _yieldSource) external onlyRole(GOVERNANCE) {
+        require(address(_yieldSource) != address(0), Errors.AE_ZERO_ADDRESS);
+
+        address yieldSourceTokenA = address(IAutoPoolYieldSource(_yieldSource).tokenA());
+        address yieldSourceTokenB = address(IAutoPoolYieldSource(_yieldSource).tokenB());
+
+        address autoPoolVaultTokenA = IAutoPoolVault(_autoPoolVault).getTokenX();
+        address autoPoolVaultTokenB = IAutoPoolVault(_autoPoolVault).getTokenY();
+
+        require(
+            (yieldSourceTokenA == autoPoolVaultTokenA && yieldSourceTokenB == autoPoolVaultTokenB)
+                || (yieldSourceTokenA == autoPoolVaultTokenB && yieldSourceTokenB == autoPoolVaultTokenA),
+            Errors.AE_INVALID_YIELDSOURCE
+        );
+
+        yieldSources[_autoPoolVault] = IAutoPoolYieldSource(_yieldSource);
+        emit YieldSourceAdded(_autoPoolVault, _yieldSource, yieldSourceTokenA, yieldSourceTokenB);
     }
 
     /**
@@ -222,16 +253,6 @@ contract FEYGMXProductFactory is IFEYFactory, FEYFactoryConfigurator {
      */
     function isMintActive(uint256 _spTokenId) external view returns (bool) {
         return (IFEYProduct(productTokenId[_spTokenId]).getCurrentState() == DataTypes.State.OPEN);
-    }
-
-    /**
-     * @notice Sets yield-source contract address for the GMX pool
-     * @param _yieldSource Address of the yield source contract
-     */
-    function setYieldSource(address _yieldSource) external onlyRole(GOVERNANCE) {
-        require(address(_yieldSource) != address(0), Errors.AE_ZERO_ADDRESS);
-        yieldSource = IGMXYieldSource(_yieldSource);
-        emit YieldSourceAdded(address(GMX_VAULT), _yieldSource, address(0), address(0));
     }
 
     /**
@@ -257,34 +278,6 @@ contract FEYGMXProductFactory is IFEYFactory, FEYFactoryConfigurator {
     }
 
     /**
-     * @notice Used to update a token status (active/inactive)
-     * @param _token The token address
-     * @param _status The status of the token
-     */
-    function setTokenStatus(address _token, uint256 _status) external override onlyRole(GOVERNANCE) {
-        require(_status == TRUE || _status == FALSE, Errors.VE_INVALID_STATUS);
-        require(GMX_VAULT.whitelistedTokens(_token), Errors.VE_INVALID_TOKEN);
-        isTokenActive[_token] = _status;
-
-        emit TokenStatusUpdated(_token, _status);
-    }
-
-    /**
-     * @notice Used to update the status of pair
-     * @param _token0 The first token address
-     * @param _token1 The second token address
-     * @param _status The status of the pair
-     */
-    function setPoolStatus(address _token0, address _token1, uint256 _status) external onlyRole(GOVERNANCE) {
-        require(_status == TRUE || _status == FALSE, Errors.VE_INVALID_STATUS);
-        require(GMX_VAULT.whitelistedTokens(_token0), Errors.VE_INVALID_TOKEN);
-        require(GMX_VAULT.whitelistedTokens(_token1), Errors.VE_INVALID_TOKEN);
-        isPoolActive[_token0][_token1] = _status;
-        isPoolActive[_token1][_token0] = _status;
-        emit PoolStatusUpdated(address(GMX_VAULT), _status, _token0, _token1);
-    }
-
-    /**
      * @notice Deploys the FEY Product based on the given config
      * @param _configTrancheSr - The configuration for the Senior Tranche
      * @param _configTrancheJr - The configuration for the Junior Tranche
@@ -305,13 +298,21 @@ contract FEYGMXProductFactory is IFEYFactory, FEYFactoryConfigurator {
         _productConfig.managementFee = managementFee;
         _productConfig.performanceFee = performanceFee;
 
-        bytes32 _salt = keccak256(
-            abi.encodePacked(_configTrancheSr.tokenAddress, _configTrancheJr.tokenAddress, _configTrancheJr.spTokenId)
-        );
+        address _srTrancheTokenAddress = address(_configTrancheSr.tokenAddress);
+        address _jrTrancheTokenAddress = address(_configTrancheJr.tokenAddress);
+
+        address _yieldSource = address(yieldSources[autoPoolVaults[_srTrancheTokenAddress][_jrTrancheTokenAddress]]);
+
+        require(_yieldSource != address(0), Errors.AE_YIELDSOURCE_NOT_SET);
 
         (_configTrancheSr.capacity, _configTrancheJr.capacity) =
-            _getTrancheCapacityValues(address(_configTrancheSr.tokenAddress), address(_configTrancheJr.tokenAddress));
-        address _newProduct = Clones.cloneDeterministic(feyProductImplementation, _salt);
+            _getTrancheCapacityValues(_srTrancheTokenAddress, _jrTrancheTokenAddress);
+
+        address _newProduct = Clones.cloneDeterministic(
+            feyProductImplementation,
+            keccak256( // salt
+            abi.encodePacked(_srTrancheTokenAddress, _jrTrancheTokenAddress, _configTrancheJr.spTokenId))
+        );
 
         DataTypes.InitConfigParam memory _initConfig =
             DataTypes.InitConfigParam(_configTrancheSr, _configTrancheJr, _productConfig);
@@ -321,7 +322,7 @@ contract FEYGMXProductFactory is IFEYFactory, FEYFactoryConfigurator {
             spTokenAddress,
             gac,
             distributionManager,
-            address(yieldSource),
+            _yieldSource,
             payable(address(wAVAX))
         );
 
@@ -379,6 +380,7 @@ contract FEYGMXProductFactory is IFEYFactory, FEYFactoryConfigurator {
             _trancheDuration >= trancheDurationMin && _trancheDuration < trancheDurationMax,
             Errors.VE_INVALID_TRANCHE_DURATION
         );
+
         require(_productConfig.leverageThresholdMin <= leverageThresholdMinCap, Errors.VE_INVALID_LEV_MIN);
         require(_productConfig.leverageThresholdMax >= leverageThresholdMaxCap, Errors.VE_INVALID_LEV_MAX);
         require(
@@ -387,7 +389,7 @@ contract FEYGMXProductFactory is IFEYFactory, FEYFactoryConfigurator {
     }
 
     /**
-     * @notice Validates if pool exists for the given set of tokens.
+     * @notice Validates if pool exists for the given set of tokens and the autopool vault is not paused.
      * @param _token0 Address for token0
      * @param _token1 Address for token1
      */
@@ -395,6 +397,9 @@ contract FEYGMXProductFactory is IFEYFactory, FEYFactoryConfigurator {
         if (isPoolActive[_token0][_token1] != TRUE || isPoolActive[_token1][_token0] != TRUE) {
             revert(Errors.VE_INVALID_POOL);
         }
+
+        IAutoPoolVault _autoPoolVault = IAutoPoolVault(autoPoolVaults[_token0][_token1]);
+        require(!_autoPoolVault.isDepositsPaused(), Errors.VE_AUTOPOOLVAULT_PAUSED);
     }
 
     /**

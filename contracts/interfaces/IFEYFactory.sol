@@ -25,30 +25,13 @@ interface IFEYFactory {
         address indexed productAddress, DataTypes.Tranche trancheType, address indexed tokenAddress, uint256 capacity
     );
 
-    /// @dev Emitted when a token's status gets updated
-    event TokenStatusUpdated(address indexed token, uint256 status);
-
     /// @dev Emitted when a LP is whitelised
     event PoolStatusUpdated(address indexed lpAddress, uint256 status, address indexed tokenA, address indexed tokenB);
 
-    /// @dev Emitted when the FEYProduct implementation is updated
-    event FEYProductImplementationUpdated(address indexed oldImplementation, address indexed newImplementation);
-
-    /// @dev The following events are emitted when respective setter methods are invoked
-    event StructPriceOracleUpdated(address indexed structPriceOracle);
-    event TrancheDurationMinUpdated(uint256 minTrancheDuration);
-    event TrancheDurationMaxUpdated(uint256 maxTrancheDuration);
-    event LeverageThresholdMinUpdated(uint256 levThresholdMin);
-    event LeverageThresholdMaxUpdated(uint256 levThresholdMax);
-    event TrancheCapacityUpdated(uint256 defaultTrancheCapUSD);
-    event PerformanceFeeUpdated(uint256 performanceFee);
-    event ManagementFeeUpdated(uint256 managementFee);
-    event MinimumInitialDepositValueUpdated(uint256 newValue);
-    event MaxFixedRateUpdated(uint256 _fixedRateMax);
     event FactoryGACInitialized(address indexed gac);
 
     /// @dev Emitted when Yieldsource address is added for a LP token
-    event YieldSourceAdded(address indexed lpToken, address indexed yieldSource);
+    event YieldSourceAdded(address indexed lpToken, address indexed yieldSource, address tokenA, address tokenB);
 
     function createProduct(
         DataTypes.TrancheConfig memory _configTrancheSr,

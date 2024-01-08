@@ -27,9 +27,6 @@ interface IFEYProduct {
     /// @dev Emitted the total amount of senior and junior tokens at maturity along with the fee
     event RemovedFundsFromLP(uint256 _srTokensReceived, uint256 _jrTokensReceived, address indexed _user);
 
-    /// @dev Emits the total fees charged for each tranche
-    event FeeCharged(uint256 feeTotalSr, uint256 feeTotalJr);
-
     /// @dev Emitted when the product invests the funds to the liquidity pool
     event Invested(
         uint256 _trancheTokensInvestedSenior,
@@ -50,20 +47,12 @@ interface IFEYProduct {
     /// @dev Emitted when the user withdraws from the pool
     event Withdrawn(DataTypes.Tranche _tranche, uint256 _amount, address indexed _user);
 
-    /// @dev Emitted when the performance fee is sent to the feeReceiver
-    event PerformanceFeeSent(DataTypes.Tranche _tranche, uint256 _tokensSent);
-
-    /// @dev Emitted when the management fee is sent to the feeReceiver
-    event ManagementFeeSent(DataTypes.Tranche _tranche, uint256 _tokensSent);
-
     /// @dev Emitted when there is a status update
     event StatusUpdated(DataTypes.State status);
 
-    /// @dev Emitted when the tranche is created
-    event TrancheCreated(DataTypes.Tranche trancheType, address indexed tokenAddress, uint256 trancheCapacityMax);
-
-    /// @dev Emitted when the `RescueTokens()` method is called
-    event TokensRescued(address _token, uint256 _amount, address _recipient);
+    /// @notice Emitted when the slippage tolerance is updated
+    /// @param _newSlippage New slippage tolerance
+    event SlippageUpdated(uint256 _newSlippage);
 
     function initialize(
         DataTypes.InitConfigParam memory _initConfig,
@@ -83,11 +72,11 @@ interface IFEYProduct {
 
     function removeFundsFromLP() external;
 
-    function claimExcessAndWithdraw(DataTypes.Tranche _tranche) external;
-
     function claimExcess(DataTypes.Tranche _tranche) external;
 
     function withdraw(DataTypes.Tranche _tranche) external;
+
+    function setSlippage(uint256 _newSlippage) external;
 
     function getProductConfig() external view returns (DataTypes.ProductConfig memory);
 

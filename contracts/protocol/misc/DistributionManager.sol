@@ -12,7 +12,7 @@ import {GACManaged} from "../common/GACManaged.sol";
 import {IGAC} from "../../interfaces/IGAC.sol";
 import {IRewardsRecipient} from "../../interfaces/IRewardsRecipient.sol";
 
-/// @author Struct Finance
+/// @author The Struct Team
 /// @title Contract that manages the distribution of token allocations and protocol revenue
 
 contract DistributionManager is IDistributionManager, GACManaged, CustomReentrancyGuard {

@@ -29,6 +29,9 @@ abstract contract StructERC1155 {
 
     mapping(address => mapping(address => bool)) public isApprovedForAll;
 
+    // Mapping from token ID to total supply of tokens
+    mapping(uint256 => uint256) public totalSupply;
+
     /*///////////////////////////////////////////////////////////////
                              METADATA LOGIC
     //////////////////////////////////////////////////////////////*/
@@ -151,6 +154,7 @@ abstract contract StructERC1155 {
         _beforeTokenTransfer(operator, address(0), to, ids, amounts, data);
 
         balanceOf[to][id] += amount;
+        totalSupply[id] += amount;
 
         emit TransferSingle(msg.sender, address(0), to, id, amount);
 
@@ -172,6 +176,7 @@ abstract contract StructERC1155 {
 
         for (uint256 i = 0; i < idsLength;) {
             balanceOf[to][ids[i]] += amounts[i];
+            totalSupply[ids[i]] += amounts[i];
 
             // An array can't have a total length
             // larger than the max uint256 value.
@@ -200,6 +205,7 @@ abstract contract StructERC1155 {
 
         for (uint256 i = 0; i < idsLength;) {
             balanceOf[from][ids[i]] -= amounts[i];
+            totalSupply[ids[i]] -= amounts[i];
 
             // An array can't have a total length
             // larger than the max uint256 value.
@@ -219,6 +225,7 @@ abstract contract StructERC1155 {
         _beforeTokenTransfer(operator, from, address(0), ids, amounts, "");
 
         balanceOf[from][id] -= amount;
+        totalSupply[id] -= amount;
 
         emit TransferSingle(msg.sender, from, address(0), id, amount);
     }

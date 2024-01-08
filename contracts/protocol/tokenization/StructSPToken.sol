@@ -22,6 +22,8 @@ contract StructSPToken is StructERC1155, GACManaged {
 
     IFEYFactory private feyProductFactory;
 
+    event FEYProductFactoryUpdated(address indexed newFactory);
+
     constructor(IGAC _globalAccessControl, IFEYFactory _feyProductFactory) {
         __GACManaged_init(_globalAccessControl);
         feyProductFactory = _feyProductFactory;
@@ -176,6 +178,7 @@ contract StructSPToken is StructERC1155, GACManaged {
      */
     function setFeyProductFactory(IFEYFactory _feyProductFactory) external onlyRole(GOVERNANCE) {
         feyProductFactory = _feyProductFactory;
+        emit FEYProductFactoryUpdated(address(_feyProductFactory));
     }
 
     /**
