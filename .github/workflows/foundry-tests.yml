@@ -20,6 +20,5 @@ jobs:
               run: npm run forge:unit-tests
 
             - name: Run Fork Tests
-              run: npm run forge:fork-tests
-              with:
-                MAINNET_RPC: ${{ secrets.MAINNET_RPC }}
+              run: MAINNET_RPC="https://api.avax.network/ext/bc/C/rpc" npm run forge:fork-tests
+               
