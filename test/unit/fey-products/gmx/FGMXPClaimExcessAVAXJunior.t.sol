@@ -4,7 +4,7 @@ pragma solidity ^0.8.11;
 import "@interfaces/IFEYFactory.sol";
 import "../../../common/fey-products/gmx/WithdrawClaimExcessBaseTestSetup.sol";
 
-contract FGMXPClaimExcessAVAXJuniorTest is WithdrawClaimExcessBaseTestSetup {
+contract FGMXPClaimExcessAVAXJunior_UnitTest is WithdrawClaimExcessBaseTestSetup {
     function onSetup() public virtual override {
         seniorTrancheIsWAVAX = false;
         depositInvestTestsFixture(seniorTrancheIsWAVAX);

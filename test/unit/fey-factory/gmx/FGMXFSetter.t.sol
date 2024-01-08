@@ -15,7 +15,7 @@ import "@core/common/StructPriceOracle.sol";
 
 import "../../../common/fey-factory/gmx/FEYFactoryBaseTestSetup.sol";
 
-contract FGMXFSetterTest is FEYFactoryBaseTestSetup {
+contract FGMXFSetters_UnitTest is FEYFactoryBaseTestSetup {
     uint256 internal _managementFee = 1e6;
 
     event TokenStatusUpdated(address indexed token, uint256 status);

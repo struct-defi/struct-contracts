@@ -8,7 +8,7 @@ import "@external/gmx/IFastPriceFeed.sol";
 
 import "../../../common/fey-products/gmx/FEYProductBaseTestSetup.sol";
 
-contract FGMXPInvest is FEYProductBaseTestSetup {
+contract FGMXPInvest_UnitTest is FEYProductBaseTestSetup {
     IGMXYieldSource public yieldSource;
     uint256 public wavaxToDeposit = 100e18;
     uint256 public usdcToDeposit = 2000e6;

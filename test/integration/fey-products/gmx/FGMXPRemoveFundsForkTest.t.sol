@@ -9,7 +9,7 @@ import "@core/libraries/helpers/Constants.sol";
 
 import "../../../common/fey-products/gmx/GMXProductBaseTestSetupLive.sol";
 
-contract FGMXPRemoveFundsForkTest is GMXProductBaseTestSetupLive {
+contract FGMXPRemoveFunds_IntegrationTest is GMXProductBaseTestSetupLive {
     DataTypes.ProductConfig private productConfig;
     uint256 public wavaxToDeposit = 100e18;
     uint256 public usdcToDeposit = 2000e6;
@@ -31,8 +31,7 @@ contract FGMXPRemoveFundsForkTest is GMXProductBaseTestSetupLive {
     event ManagementFeeSent(DataTypes.Tranche _tranche, uint256 _tokensSent);
 
     function setUp() public virtual override {
-        /// Remove hardcoding and move it to use env string - vm.envString("MAINNET_RPC")
-        vm.createSelectFork("https://api.avax.network/ext/bc/C/rpc", 24540193);
+        vm.createSelectFork(vm.envString("MAINNET_RPC"), 24540193);
 
         super.setUp();
 

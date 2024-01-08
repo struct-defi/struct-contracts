@@ -11,7 +11,7 @@ import "@core/libraries/helpers/Errors.sol";
 
 import "../../../common/fey-products/gmx/FEYProductBaseTestSetup.sol";
 
-contract FGMXPDeposit is FEYProductBaseTestSetup {
+contract FGMXPDeposit_UnitTest is FEYProductBaseTestSetup {
     function onSetup() public virtual override {
         depositInvestTestsFixture(seniorTrancheIsWAVAX);
     }

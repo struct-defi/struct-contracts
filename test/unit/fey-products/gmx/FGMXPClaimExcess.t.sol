@@ -10,7 +10,7 @@ import "@interfaces/IFEYFactory.sol";
 
 import "../../../common/fey-products/gmx/FEYProductBaseTestSetup.sol";
 
-contract FGMXPClaimExcess is FEYProductBaseTestSetup {
+contract FGMXPClaimExcess_UnitTest is FEYProductBaseTestSetup {
     uint256 public wavaxToDeposit = 100e18;
     uint256 public usdcToDeposit = 2000e6;
 

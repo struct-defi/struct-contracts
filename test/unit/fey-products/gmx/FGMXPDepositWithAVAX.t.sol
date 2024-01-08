@@ -11,7 +11,7 @@ import "@core/libraries/helpers/Errors.sol";
 
 import "../../../common/fey-products/gmx/FEYProductBaseTestSetup.sol";
 
-contract FGMXPDepositWithAVAX is FEYProductBaseTestSetup {
+contract FGMXPDepositWithAVAX_UnitTest is FEYProductBaseTestSetup {
     uint256 private _depositAmount = 1e18;
     uint256 private userBalance = 100e18;
 
@@ -141,5 +141,28 @@ contract FGMXPDepositWithAVAX is FEYProductBaseTestSetup {
         vm.expectEmit(false, true, true, true);
         emit Deposit(address(user1), _depositAmount);
         user1.depositAvaxToSenior(_depositAmount, _depositAmount);
+    }
+
+    function testDeposit_AVAX_WAVAX_SeniorTranche() external {
+        console.log("Deposit with AVAX then wAVAX should keep track of user sum and depositedNative stays true");
+        // step 1: deposit AVAX
+        deal(address(user1), userBalance);
+        vm.mockCall(factory, abi.encodeWithSelector(IFEYFactory.isMintActive.selector), abi.encode(true));
+        user1.depositAvaxToSenior(userBalance, userBalance);
+        DataTypes.Investor memory _investorDetails = user1.getInvestorDetails(DataTypes.Tranche.Senior);
+        assertEq(_investorDetails.depositedNative, true, "user deposited AVAX");
+        uint256 _userSum1 = _investorDetails.userSums[_investorDetails.userSums.length - 1];
+        assertEq(_userSum1, userBalance, "user sum recorded as 1 wei");
+
+        // step 2: deposit wAVAX
+        deal(address(wavax), address(user1), userBalance);
+        user1.increaseAllowance(address(wavax), userBalance);
+        user1.depositToSenior(userBalance);
+        DataTypes.Investor memory _investorDetails2 = user1.getInvestorDetails(DataTypes.Tranche.Senior);
+        uint256 _userSum2 = _investorDetails2.userSums[_investorDetails2.userSums.length - 1];
+        assertEq(_userSum2, userBalance * 2, "user sum recorded as userBalance x 2");
+        assertEq(address(user1).balance, 0, "AVAX transferred from user");
+        assertEq(IERC20Metadata(address(wavax)).balanceOf(address(user1)), 0, "wAVAX transferred from user");
+        assertEq(_investorDetails2.depositedNative, true, "user deposited AVAX is still true");
     }
 }

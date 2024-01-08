@@ -6,15 +6,14 @@ import "@core/libraries/helpers/Errors.sol";
 
 import "../../../common/fey-products/gmx/GMXProductBaseTestSetupLive.sol";
 
-contract FGMXPClaimExcessForkTest is GMXProductBaseTestSetupLive {
+contract FGMXPClaimExcess_IntegrationTest is GMXProductBaseTestSetupLive {
     uint256 public wavaxToDeposit = 100e18;
     uint256 public usdcToDeposit = 2000e6;
     uint256 private wavaxToBeInvested = 224847521055007055319;
     uint256 private usdcToBeInvested = 27021141;
 
     function setUp() public virtual override {
-        /// Remove hardcoding and move it to use env string - vm.envString("MAINNET_RPC")
-        vm.createSelectFork("https://api.avax.network/ext/bc/C/rpc", 24540193);
+        vm.createSelectFork(vm.envString("MAINNET_RPC"), 24540193);
 
         super.setUp();
         makeInitialDeposits();

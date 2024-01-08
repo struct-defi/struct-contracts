@@ -11,7 +11,7 @@ import "@mocks/MockERC20.sol";
 
 import "../../../common/fey-products/gmx/FEYProductBaseTestSetup.sol";
 
-contract FGMXPWithdrawTest is FEYProductBaseTestSetup {
+contract FGMXPWithdraw_UnitTest is FEYProductBaseTestSetup {
     uint256 public wavaxToDeposit = 100e18;
     uint256 public usdcToDeposit = 2000e6;
 

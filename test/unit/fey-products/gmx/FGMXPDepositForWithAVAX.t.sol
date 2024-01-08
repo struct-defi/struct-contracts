@@ -11,7 +11,7 @@ import "@core/libraries/helpers/Errors.sol";
 
 import "../../../common/fey-products/gmx/FEYProductBaseTestSetup.sol";
 
-contract FGMXPDepositForWithAVAX is FEYProductBaseTestSetup {
+contract FGMXPDepositForWithAVAX_UnitTest is FEYProductBaseTestSetup {
     uint256 private _depositAmount = 1e18;
     uint256 private userBalance = 100e18;
 
