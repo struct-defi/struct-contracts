@@ -4,7 +4,6 @@ pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract BoringOwnableData {
@@ -175,7 +174,9 @@ contract MockRewarder is IRewardooor, BoringOwnable, ReentrancyGuard {
 
     function onJoeReward(address _user, uint256 newLpAmount, uint256 aptSupply) external override nonReentrant {
         if (_user == address(0)) return;
-        if (lastClaimed[_user] == 0) lastClaimed[_user] = block.timestamp - 10000;
+        if (lastClaimed[_user] == 0) {
+            lastClaimed[_user] = block.timestamp - 10000;
+        }
         uint256 timeElapsed = block.timestamp - lastClaimed[_user];
         lastClaimed[_user] = block.timestamp;
 
