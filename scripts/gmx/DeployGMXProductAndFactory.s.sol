@@ -3,12 +3,7 @@ pragma solidity 0.8.11;
 
 import "forge-std/src/Script.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-
-import "./deployment-helpers/Addresses.sol";
-
 import "@core/libraries/types/DataTypes.sol";
-import "@core/libraries/helpers/Constants.sol";
-
 import "@core/common/GlobalAccessControl.sol";
 import "@core/common/StructPriceOracle.sol";
 import "@core/tokenization/StructSPToken.sol";
@@ -16,30 +11,14 @@ import "@core/products/gmx/FEYGMXProduct.sol";
 import "@core/products/gmx/FEYGMXProductFactory.sol";
 import "@core/misc/DistributionManager.sol";
 import "@core/yield-sources/GMXYieldSource.sol";
-
 import "@interfaces/IGAC.sol";
 import "@interfaces/IDistributionManager.sol";
 import "@interfaces/IFEYFactory.sol";
+import {ConfigDevelop} from "../../deployment-helpers/develop/ConfigDevelop.sol";
 
-contract Deploy is Script, Addresses {
-    uint256 internal allocatedTotalPoints = 1e3;
-    uint256 internal allocationPoints = 1e3;
-    uint256 internal allocationFee = 1e3;
-    uint256 internal rewardsPerSec = 1;
-    uint256 rewardsPerSecond = 0;
-    IDistributionManager.RecipientData[] internal recipients;
-
-    bytes32 public constant GOVERNANCE = keccak256("GOVERNANCE");
-    bytes32 public constant FACTORY = keccak256("FACTORY");
-    bytes32 public constant WHITELISTED = keccak256("WHITELISTED");
-    bytes32 public constant WHITELIST_MANAGER = keccak256("WHITELIST_MANAGER");
-    bytes32 public constant DEFAULT_ADMIN_ROLE = 0x00;
-    bytes32 public constant KEEPER = keccak256("KEEPER");
-
+contract DeployGMXProductAndFactory is Script, ConfigDevelop {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        address deployerAddress = vm.addr(deployerPrivateKey);
-
         vm.startBroadcast(deployerPrivateKey);
 
         if (STRUCT_PRICE_ORACLE == address(0)) {
@@ -136,17 +115,20 @@ contract Deploy is Script, Addresses {
         gac.grantRole(WHITELIST_MANAGER, MULTISIG);
         gac.grantRole(GOVERNANCE, MULTISIG);
         gac.grantRole(DEFAULT_ADMIN_ROLE, MULTISIG);
-        gac.grantRole(KEEPER, AUTO_AVAX);
 
         for (uint256 index = 0; index < WHITELISTABLE_ADDRESSES.length; index++) {
             gac.grantRole(WHITELISTED, WHITELISTABLE_ADDRESSES[index]);
         }
 
         feyGMXProductFactory.setTokenStatus(USDC, 1);
+        feyGMXProductFactory.setTokenStatus(WAVAX, 1);
         feyGMXProductFactory.setTokenStatus(BTCB, 1);
 
+        feyGMXProductFactory.setPoolStatus(USDC, WAVAX, 1);
         feyGMXProductFactory.setPoolStatus(USDC, BTCB, 1);
+        feyGMXProductFactory.setPoolStatus(WAVAX, BTCB, 1);
         feyGMXProductFactory.setPoolStatus(USDC, USDC, 1);
+        feyGMXProductFactory.setPoolStatus(WAVAX, WAVAX, 1);
         feyGMXProductFactory.setPoolStatus(BTCB, BTCB, 1);
 
         /// @dev Important: Donot remove these renounceRole calls!
