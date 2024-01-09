@@ -129,7 +129,6 @@ contract FEYGMXProduct is FEYProduct, TraderJoeLPAdapter {
             trancheInfo[DataTypes.Tranche.Junior].tokensExcess = _jrTotal;
             trancheInfo[DataTypes.Tranche.Senior].tokensInvestable = 0;
             trancheInfo[DataTypes.Tranche.Junior].tokensInvestable = 0;
-            // TODO: Add a new State?
             currentState = DataTypes.State.WITHDRAWN;
             /// @dev Events to transition product state in the subgraph
             emit Invested(0, 0, 0, 0);
@@ -318,7 +317,7 @@ contract FEYGMXProduct is FEYProduct, TraderJoeLPAdapter {
         /// The simplified formula is: (tokensInvestable * (1 + fixedRate * trancheDuration / 1 year))
         uint256 _srFrFactor = (
             trancheInfo[DataTypes.Tranche.Senior].tokensInvestable * Constants.YEAR_IN_SECONDS
-                + trancheInfo[DataTypes.Tranche.Senior].tokensInvestable * productConfig.fixedRate * _trancheDuration
+                + (trancheInfo[DataTypes.Tranche.Senior].tokensInvestable * productConfig.fixedRate * _trancheDuration)
                     / Constants.DECIMAL_FACTOR
         ) / Constants.YEAR_IN_SECONDS;
 

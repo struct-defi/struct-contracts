@@ -4,7 +4,7 @@ pragma solidity 0.8.11;
 import {Addresses} from "../Addresses.sol";
 
 contract AddressesProduction is Addresses {
-    address internal constant MULTISIG = 0x0daa96b1127A8792571981917004eCA8be447419; // TODO double check this
+    address internal constant MULTISIG = 0x0daa96b1127A8792571981917004eCA8be447419;  
 
     address internal constant STRUCT_PRICE_ORACLE = 0x6F51D8FA3b4F1C65344EBA11d21108fd4a4Fb41E;
     address internal constant STRUCT_DISTRIBUTION_MANAGER = 0xa00c95477be638952C8E11eFEf8260D59d2ee7A3;

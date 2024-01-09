@@ -78,7 +78,7 @@ contract DeployAutoPoolProductAndFactoryProduction is Script, AddressesProductio
             spToken = StructSPToken(STRUCT_SP_TOKEN);
         }
 
-        /// DistrubtionManager
+        /// DistributionManager
         DistributionManager distributionManager;
         if (STRUCT_DISTRIBUTION_MANAGER == address(0)) {
             console.log("About to deploy the DistributionManager contract");

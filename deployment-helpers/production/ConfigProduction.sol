@@ -10,9 +10,8 @@ contract ConfigProduction is Config {
     uint256 internal allocatedTotalPoints = 1e3;
     uint256 internal allocationPoints = 1e3;
     uint256 internal allocationFee = 1e3;
-    uint256 internal rewardsPerSec = 1;
-    uint256 rewardsPerSecond = 0;
-
+    uint256 internal rewardsPerSec;
+ 
     uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY_PRODUCTION");
     address deployerAddress = vm.addr(deployerPrivateKey);
 }
