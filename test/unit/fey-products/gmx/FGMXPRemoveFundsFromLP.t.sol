@@ -3,7 +3,7 @@ pragma solidity 0.8.11;
 import "@core/libraries/helpers/Errors.sol";
 import "../../../common/fey-products/gmx/FEYProductBaseTestSetup.sol";
 
-contract FGMXPRemoveFundsFromLP is FEYProductBaseTestSetup {
+contract FGMXPRemoveFundsFromLP_UnitTest is FEYProductBaseTestSetup {
     function setUp() public virtual override {
         super.setUp();
     }

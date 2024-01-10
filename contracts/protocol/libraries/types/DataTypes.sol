@@ -4,11 +4,6 @@ pragma solidity ^0.8.11;
 /// External Imports
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
-/// Internal Imports
-import "../../../external/traderjoe/IJoeRouter.sol";
-import "../../../external/traderjoe/IJoePair.sol";
-import "../../../external/traderjoe/IMasterChef.sol";
-
 library DataTypes {
     /// @notice It contains the details of the tranche
     struct TrancheInfo {
@@ -94,6 +89,19 @@ library DataTypes {
         Junior
     }
 
+    /// @dev Swap path types for setter function
+    enum SwapPathType {
+        SeniorToNative,
+        JuniorToNative,
+        NativeToSenior,
+        NativeToJunior,
+        Reward2ToNative,
+        NativeToTokenA,
+        NativeToTokenB,
+        TokenAToTokenB,
+        TokenBToTokenA
+    }
+
     /// @notice Struct used to store the details of the investor
     /// @dev Inspired by Ondo Finance
     struct Investor {
@@ -114,23 +122,6 @@ library DataTypes {
         address[] juniorToNative;
         address[] reward1ToNative;
         address[] reward2ToNative;
-    }
-
-    /// @notice It contains all the contract addresses for interaction
-    struct Addresses {
-        IERC20Metadata nativeToken;
-        IERC20Metadata reward1;
-        IERC20Metadata reward2;
-        IJoePair lpToken;
-        IMasterChef masterChef;
-        IJoeRouter router;
-    }
-
-    // amount: amount of Struct tokens that are currently locked
-    // end: epoch time that the lock expires (doesn't seem to be in epoch units, but the time of the final epoch)
-    struct LockedBalance {
-        int128 amount;
-        uint256 end;
     }
 
     // Contains tranche config to prevent stack too deep
@@ -156,5 +147,19 @@ library DataTypes {
         uint256 fsGLPReceived;
         uint256 shares;
         bool sameToken;
+    }
+
+    /// @notice The struct contains the product and share details for the given AutoPool redemption round.
+    /// @custom: totalShares Total product shares to be queued for withdrawal.
+    /// @custom: totalAutoPoolTokens Total amount of AutoPool share tokens queued for withdrawal.
+    /// @custom: redeemed  Flag to mark if the current round redeemed or not.
+    /// @custom: products Address of product contracts queued for withdrawal for the specific round.
+    /// @custom: shares Shares of product at the time when queued for withdrawal.
+    struct Round {
+        uint256 totalShares;
+        uint256 totalAutoPoolTokens;
+        bool redeemed;
+        address[] products;
+        uint256[] shares;
     }
 }

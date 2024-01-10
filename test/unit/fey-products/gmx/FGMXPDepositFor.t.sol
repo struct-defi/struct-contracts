@@ -10,7 +10,7 @@ import "@mocks/MockERC20.sol";
 
 import "../../../common/fey-products/gmx/FEYProductBaseTestSetup.sol";
 
-contract FGMXPDepositFor is FEYProductBaseTestSetup {
+contract FGMXPDepositFor_UnitTest is FEYProductBaseTestSetup {
     function onSetup() public virtual override {
         depositInvestTestsFixture(seniorTrancheIsWAVAX);
     }

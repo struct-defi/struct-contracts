@@ -14,7 +14,7 @@ import "@core/libraries/helpers/Errors.sol";
 
 import "../../../common/fey-factory/gmx/FEYFactoryBaseTestSetup.sol";
 
-contract FGMXFCreateProductTest is FEYFactoryBaseTestSetup {
+contract FGMXFCreateProduct_UnitTest is FEYFactoryBaseTestSetup {
     uint256 internal initialDepositAmount = 100e18;
     uint256 internal avaxValue = 100e18;
     uint256 private usdcValueDecimalsScalingFactor = 10 ** 12;
@@ -854,7 +854,6 @@ contract FGMXFCreateProductTest is FEYFactoryBaseTestSetup {
             DataTypes.TrancheConfig memory trancheConfigJunior,
             DataTypes.ProductConfigUserInput memory productConfig
         ) = user1.constructProductParams(address(wavax), address(usdc));
-
         productConfig.leverageThresholdMin = 1000000;
         productConfig.leverageThresholdMax = 1000000;
         user1.createProductAndDepositAVAXCustom(

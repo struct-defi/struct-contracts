@@ -17,4 +17,9 @@ interface ISPToken is IERC1155 {
     /// @param id the id of the token to be burnt
     /// @param amount the amount of tokens to be burnt
     function burn(address from, uint256 id, uint256 amount) external;
+
+    /// @notice gets the total circulating supply of the given token id
+    /// @param id the id of the token
+    /// @return the total circulating supply of the token
+    function totalSupply(uint256 id) external view returns (uint256);
 }

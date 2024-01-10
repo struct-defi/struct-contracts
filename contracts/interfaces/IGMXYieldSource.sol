@@ -63,8 +63,9 @@ interface IGMXYieldSource {
 
     function redeemTokens(uint256 _expectedTokenAAmount) external returns (uint256, uint256);
 
-    /// @notice Re-compounds rewards
+    /// @notice Recompounds rewards
     function recompoundRewards() external;
 
+    ///@notice Returns the {FEYGMXProductInfo} for the given `_productAddress`
     function getFEYGMXProductInfo(address _productAddress) external view returns (DataTypes.FEYGMXProductInfo memory);
 }

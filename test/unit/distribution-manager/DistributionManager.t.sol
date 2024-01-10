@@ -14,7 +14,7 @@ import {IGAC} from "@interfaces/IGAC.sol";
 import {DistributionManagerUser} from "../../common/distribution-manager/DistributionManagerUser.sol";
 import {RewardsRecipient} from "../../common/distribution-manager/RewardsRecipient.sol";
 
-contract DistributionManagerTest is Test {
+contract DistributionManager_UnitTest is Test {
     bytes32 public constant GOVERNANCE = keccak256("GOVERNANCE");
     bytes32 public constant PRODUCT = keccak256("PRODUCT");
     bytes32 public constant FACTORY = keccak256("FACTORY");

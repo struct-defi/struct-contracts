@@ -5,7 +5,7 @@ import "forge-std/src/Test.sol";
 import "@core/common/StructPriceOracle.sol";
 import "../../common/price-oracle/PriceOracleUser.sol";
 
-contract StructPriceOracleTest is Test {
+contract StructPriceOracle_UnitTest is Test {
     StructPriceOracle internal sut;
     address[] internal assets;
     AggregatorV3Interface[] internal sources;

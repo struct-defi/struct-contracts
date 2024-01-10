@@ -9,7 +9,7 @@ import {WadMath} from "../../../../contracts/utils/WadMath.sol";
 
 import "../../../common/fey-products/gmx/GMXProductBaseTestSetupLive.sol";
 
-contract FGMXPInvestForkTest is GMXProductBaseTestSetupLive {
+contract FGMXPInvest_IntegrationTest is GMXProductBaseTestSetupLive {
     using WadMath for uint256;
 
     uint256 public wavaxToDeposit = 100e18;
@@ -33,8 +33,7 @@ contract FGMXPInvestForkTest is GMXProductBaseTestSetupLive {
     event StatusUpdated(DataTypes.State currentStatus);
 
     function setUp() public virtual override {
-        /// Remove hardcoding and move it to use env string - vm.envString("MAINNET_RPC")
-        vm.createSelectFork("https://api.avax.network/ext/bc/C/rpc", 24540193);
+        vm.createSelectFork(vm.envString("MAINNET_RPC"), 24540193);
 
         super.setUp();
         makeInitialDeposits();
@@ -313,10 +312,17 @@ contract FGMXPInvestForkTest is GMXProductBaseTestSetupLive {
     {
         uint256 _trancheCapacity = 1000 * 10 ** IERC20Metadata(_trancheToken).decimals();
         /// Deploy FEYProduct
-        DataTypes.TrancheConfig memory trancheConfig = DataTypes.TrancheConfig({
+        DataTypes.TrancheConfig memory trancheConfigSr = DataTypes.TrancheConfig({
             tokenAddress: IERC20Metadata(_trancheToken),
             decimals: IERC20Metadata(_trancheToken).decimals(),
-            spTokenId: 0,
+            spTokenId: 2,
+            capacity: _trancheCapacity
+        });
+
+        DataTypes.TrancheConfig memory trancheConfigJr = DataTypes.TrancheConfig({
+            tokenAddress: IERC20Metadata(_trancheToken),
+            decimals: IERC20Metadata(_trancheToken).decimals(),
+            spTokenId: 3,
             capacity: _trancheCapacity
         });
 
@@ -333,7 +339,7 @@ contract FGMXPInvestForkTest is GMXProductBaseTestSetupLive {
         });
 
         DataTypes.InitConfigParam memory initConfigParams =
-            DataTypes.InitConfigParam(trancheConfig, trancheConfig, productConfig);
+            DataTypes.InitConfigParam(trancheConfigSr, trancheConfigJr, productConfig);
         _product = new GMXProductHarness();
         setupYieldSource();
         _product.initialize(

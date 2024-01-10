@@ -23,8 +23,39 @@ import "@mocks/ERC1155ReceiverMock.sol";
 contract FEYProductUser is ERC1155Holder {
     IFEYProduct public feyProduct;
 
+    uint256 public avaxBalanceBefore = 0;
+    uint256 public avaxBalanceAfter = 0;
+    mapping(uint256 => uint256) public spTokenBalanceBefore;
+    mapping(uint256 => uint256) public spTokenBalanceAfter;
+    mapping(address => uint256) public trancheTokenBalanceBefore;
+    mapping(address => uint256) public trancheTokenBalanceAfter;
+
     constructor(address _feyProduct) {
         feyProduct = IFEYProduct(_feyProduct);
+    }
+
+    function recordTrancheTokenBalance(IERC20Metadata _token, bool _isBefore) public {
+        if (_isBefore) {
+            trancheTokenBalanceBefore[address(_token)] = _token.balanceOf(address(this));
+        } else {
+            trancheTokenBalanceAfter[address(_token)] = _token.balanceOf(address(this));
+        }
+    }
+
+    function recordSpTokenBalance(bool _isBefore, DataTypes.Tranche _tranche, uint256 _amount) public {
+        if (_isBefore) {
+            spTokenBalanceBefore[uint256(_tranche)] = _amount;
+        } else {
+            spTokenBalanceAfter[uint256(_tranche)] = _amount;
+        }
+    }
+
+    function recordAvaxBalance(bool _isBefore) public {
+        if (_isBefore) {
+            avaxBalanceBefore = address(this).balance;
+        } else {
+            avaxBalanceAfter = address(this).balance;
+        }
     }
 
     function balanceOf() external view returns (uint256) {
@@ -69,10 +100,6 @@ contract FEYProductUser is ERC1155Holder {
 
     function removeFundsFromLP() external {
         feyProduct.removeFundsFromLP();
-    }
-
-    function claimExcessAndWithdraw(DataTypes.Tranche _tranche) external {
-        feyProduct.claimExcessAndWithdraw(_tranche);
     }
 
     function claimExcess(DataTypes.Tranche _tranche) external {

@@ -8,6 +8,8 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 
 /// Internal Imports
 import {IJoeRouter} from "../../../external/traderjoe/IJoeRouter.sol";
+import {ILBQuoter} from "../../../external/traderjoe/ILBQuoter.sol";
+
 import {IWETH9} from "../../../external/IWETH9.sol";
 
 import {IStructPriceOracle} from "../../../interfaces/IStructPriceOracle.sol";
@@ -94,7 +96,7 @@ library Helpers {
      * @param _rate2 Rate from the Chainlink price feed
      * @return A flag that states whether the given rates lies within the `MAX_DEVIATION`
      */
-    function _isWithinBound(uint256 _rate1, uint256 _rate2) private pure returns (bool) {
+    function _isWithinBound(uint256 _rate1, uint256 _rate2) public pure returns (bool) {
         uint256 _relativeChangePct;
         if (_rate1 > _rate2) {
             _relativeChangePct = ((_rate1 - _rate2) * Constants.DECIMAL_FACTOR * Constants.WAD) / _rate2;
@@ -208,48 +210,6 @@ library Helpers {
     }
 
     /**
-     * @notice Deposits the given amount of tokens to the specified tranche
-     * @param _trancheInfo Tranche info struct of the tranche into which the user's funds are being deposited
-     * @param _trancheConfig Tranche config struct of the tranche into which the user's funds are being deposited
-     * @param _amount The deposit amount
-     * @param _investorAddress The address of the depositor
-     * @param spToken Address of the StructSP token
-     * @param _investor The investor struct to record `userSums` and `depositSums`
-     * @return _newTotal The total deposits in the tranche after the current deposit by investor
-     */
-    function _depositToTranche(
-        DataTypes.TrancheInfo storage _trancheInfo,
-        DataTypes.TrancheConfig storage _trancheConfig,
-        uint256 _amount,
-        address _investorAddress,
-        address _callerAddress,
-        ISPToken spToken,
-        DataTypes.Investor storage _investor
-    ) external returns (uint256) {
-        if (!_investor.depositedNative) {
-            uint256 tokenBalanceBefore = _trancheConfig.tokenAddress.balanceOf(address(this));
-            _trancheConfig.tokenAddress.safeTransferFrom(_callerAddress, address(this), _amount);
-            _amount = _trancheConfig.tokenAddress.balanceOf(address(this)) - tokenBalanceBefore;
-        }
-
-        _amount = tokenDecimalsToWei(_trancheConfig.decimals, _amount);
-
-        uint256 _newTotal = _trancheInfo.tokensDeposited + _amount;
-        _trancheInfo.tokensDeposited = _newTotal;
-        if (_investor.userSums.length == 0) {
-            _investor.userSums.push(_amount);
-        } else {
-            _investor.userSums.push(_amount + _investor.userSums[_investor.userSums.length - 1]);
-        }
-
-        _investor.depositSums.push(_newTotal);
-
-        spToken.mint(_investorAddress, _trancheConfig.spTokenId, _amount, "0x0");
-
-        return _newTotal;
-    }
-
-    /**
      * @notice Returns the price of the given asset
      * @param _structPriceOracle The oracle address of Struct price feed
      * @param _asset The address of the asset
@@ -262,29 +222,39 @@ library Helpers {
      * @notice Validates and returns the exchange rate for the given assets from the chainlink oracle and AMM.
      * @dev This is required to prevent oracle manipulation attacks.
      * @param _structPriceOracle The oracle address of Struct price feed
-     * @param _asset1 The address of the asset 1
-     * @param _asset1 The address of the asset 2
      * @param _path The path to get the exchange rate from the AMM (LP)
-     * @param _router The address of the AMM's Router contract
+     * @param _lbQuoter The address of the TJ LB Quoter contract
+     * @param _amountOut The amount of tokens to be swapped out
      */
-    function getTrancheTokenRate(
+    function getTrancheTokenRateV2(
         IStructPriceOracle _structPriceOracle,
-        address _asset1,
-        address _asset2,
         address[] storage _path,
-        IJoeRouter _router
+        ILBQuoter _lbQuoter,
+        uint256 _amountOut
     ) external view returns (bool, uint256, uint256, uint256) {
-        uint256 _priceAsset1 = getAssetPrice(_structPriceOracle, _asset1);
-        uint256 _priceAsset2 = getAssetPrice(_structPriceOracle, _asset2);
-
+        uint256 _toTokenIndex = _path.length - 1;
+        uint256 _priceAsset1 = _structPriceOracle.getAssetPrice(_path[0]);
+        uint256 _priceAsset2 = _structPriceOracle.getAssetPrice(_path[_toTokenIndex]);
         /// Calculate the exchange rate using the prices from StructPriceOracle (Chainlink price feed)
-        uint256 _chainlinkRate = (_priceAsset1 * 10 ** 18) / _priceAsset2;
+        uint256 _chainlinkRate = (_priceAsset1 * Constants.WAD) / _priceAsset2;
 
+        ILBQuoter.Quote memory quote;
+        uint256 _ammRate;
         /// Calculate the exchange rate using the Router
-        uint256 _ammRate = tokenDecimalsToWei(
-            IERC20Metadata(_asset2).decimals(),
-            JoeLibrary.getQuote(_router.factory(), 10 ** IERC20Metadata(_asset1).decimals(), _path)[_path.length - 1]
-        );
+        if (_amountOut == 0) {
+            quote = _lbQuoter.findBestPathFromAmountIn(_path, uint128(10 ** IERC20Metadata(_path[0]).decimals()));
+            // no need to divide by the amountIn because it is equivalent to WAD
+            _ammRate = tokenDecimalsToWei(IERC20Metadata(_path[_toTokenIndex]).decimals(), quote.amounts[_toTokenIndex]);
+        } else {
+            /// if amountOut < 1 token, set it to 10 ** decimals to avoid incorrect rate
+            if (_amountOut < 10 ** IERC20Metadata(_path[_toTokenIndex]).decimals()) {
+                _amountOut = 10 ** IERC20Metadata(_path[_toTokenIndex]).decimals();
+            }
+            _amountOut = weiToTokenDecimals(IERC20Metadata(_path[_toTokenIndex]).decimals(), _amountOut);
+            quote = _lbQuoter.findBestPathFromAmountOut(_path, uint128(_amountOut));
+            _ammRate = tokenDecimalsToWei(IERC20Metadata(_path[_toTokenIndex]).decimals(), quote.amounts[_toTokenIndex])
+                * Constants.WAD / tokenDecimalsToWei(IERC20Metadata(_path[0]).decimals(), quote.amounts[0]);
+        }
 
         /// Check if the relative price diff % is within the MAX_DEVIATION
         /// if yes, return the exchange rate and chainlink price along with a flag

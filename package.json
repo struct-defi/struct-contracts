@@ -26,9 +26,9 @@
     "solhint": "./node_modules/.bin/solhint -f table contracts/**/*.sol",
     "commit": "./node_modules/cz-customizable/standalone.js",
     "prepare": "husky install",
-    "forge:unit-tests": "forge test -vv --no-match-contract ForkTest",
+    "forge:unit-tests": "forge test -vv --match-contract UnitTest",
     "forge:coverage:ci": "forge coverage --report lcov",
-    "forge:fork-tests": "forge test -vv --match-contract ForkTest",
+    "forge:fork-tests": "forge test -vv --match-contract IntegrationTest",
     "deploy:fuji:gmx": "forge script scripts/gmx/Deploy.s.sol:Deploy --rpc-url https://api.avax-test.network/ext/bc/C/rpc --broadcast",
     "deploy:avax-cchain:gmx": "cross-env forge script scripts/gmx/Deploy.s.sol:Deploy --rpc-url https://api.avax.network/ext/bc/C/rpc --broadcast --slow"
   },

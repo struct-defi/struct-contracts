@@ -13,7 +13,7 @@ import "../../common/yield-sources/GMXYieldSourceHarness.sol";
 
 import "../../common/BaseTestSetup.sol";
 
-contract GMXYieldSourceTest is BaseTestSetup {
+contract GMXYieldSource_UnitTest is BaseTestSetup {
     /// System under test
     GMXYieldSourceHarness internal sut;
 

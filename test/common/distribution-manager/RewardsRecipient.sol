@@ -4,7 +4,7 @@ pragma solidity ^0.8.11;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
- * @author Struct Finance
+ * @author The Struct Team
  * @title Contract that receives the distribution of token allocations and protocol revenue
  *
  * @dev The contract acts as the recipient of Struct token allocations and protocol revenue from the distribution manager contract.

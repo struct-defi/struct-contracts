@@ -7,12 +7,11 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /// Internal Imports
 import {IJoeRouter} from "../../external/traderjoe/IJoeRouter.sol";
-import {IJoeFactory} from "../../external/traderjoe/IJoeFactory.sol";
-import {IMasterChef} from "../../external/traderjoe/IMasterChef.sol";
 
-import {DataTypes} from "../libraries/types/DataTypes.sol";
+import {ILBRouter} from "../../external/traderjoe/ILBRouter.sol";
+import {ILBQuoter} from "../../external/traderjoe/ILBQuoter.sol";
+
 import {Helpers} from "../libraries/helpers/Helpers.sol";
-import {Constants} from "../libraries/helpers/Constants.sol";
 
 /**
  * @title TraderJoeLpAdapter
@@ -21,6 +20,7 @@ import {Constants} from "../libraries/helpers/Constants.sol";
  * @author Struct Finance
  *
  */
+
 abstract contract TraderJoeLPAdapter {
     using SafeERC20 for IERC20Metadata;
 
@@ -36,45 +36,55 @@ abstract contract TraderJoeLPAdapter {
     /// @dev Address of the JoeRouter contract
     IJoeRouter public immutable joeRouter = IJoeRouter(0x60aE616a2155Ee3d9A68541Ba4544862310933d4);
 
-    /// @dev Address of the MasterChef contract
-    IMasterChef public immutable masterChef = IMasterChef(0x4483f0b6e2F5486D06958C20f8C39A7aBe87bf8F);
+    /// @dev Address of the LiquidityBook router contract
+    ILBRouter public immutable lbRouter = ILBRouter(0xb4315e873dBcf96Ffd0acd8EA43f689D8c20fB30);
 
-    /*////////////////////////////////////////////////////////////*/
-    /*                      INTERNAL METHODS                      */
-    /*////////////////////////////////////////////////////////////*/
+    /// @dev Address of the LiquidityBook quoter contract
+    ILBQuoter public immutable lbQuoter = ILBQuoter(0x64b57F4249aA99a812212cee7DAEFEDC40B203cD);
 
     /**
-     * @notice Used to swap tokens
-     * @param amtIn Amount in
-     * @param amtOutMin Minimum amount expected
+     * @notice Used to swap from exact tokens to tokens
+     * @param _amountIn Amount in
+     * @param _minimumAmountOut Minimum amount expected
      * @param _path The swap path
+     * @param _receiver Address of the receiver
      * @return _amtTokensReceived Tokens received after swap
      */
-    function _swapExact(uint256 amtIn, uint256 amtOutMin, address[] memory _path)
+    function _swapExact(uint256 _amountIn, uint256 _minimumAmountOut, address[] memory _path, address _receiver)
         internal
         returns (uint256 _amtTokensReceived)
     {
-        uint256 _amtIn = (amtIn * 10 ** IERC20Metadata(_path[0]).decimals()) / Constants.WAD;
-        uint256 _amtOutMin = (amtOutMin * 10 ** IERC20Metadata(_path[_path.length - 1]).decimals()) / Constants.WAD;
-        IERC20Metadata(_path[0]).safeIncreaseAllowance(address(joeRouter), amtIn);
-        _amtTokensReceived = joeRouter.swapExactTokensForTokens(
-            _amtIn, _amtOutMin, _path, address(this), block.timestamp
-        )[_path.length - 1];
-    }
+        ILBQuoter.Quote memory _quote;
 
-    /*////////////////////////////////////////////////////////////*/
-    /*                           VIEWS                            */
-    /*////////////////////////////////////////////////////////////*/
+        _amountIn = Helpers.weiToTokenDecimals(IERC20Metadata(_path[0]).decimals(), _amountIn);
+
+        _quote = lbQuoter.findBestPathFromAmountIn(_path, uint128(_amountIn));
+
+        _minimumAmountOut =
+            Helpers.weiToTokenDecimals(IERC20Metadata(_path[_path.length - 1]).decimals(), _minimumAmountOut);
+
+        IERC20Metadata(_path[0]).safeIncreaseAllowance(address(lbRouter), _amountIn);
+
+        ILBRouter.Path memory _route = ILBRouter.Path(_quote.binSteps, _quote.versions, _quote.route);
+
+        _amtTokensReceived =
+            lbRouter.swapExactTokensForTokens(_amountIn, _minimumAmountOut, _route, _receiver, block.timestamp + 1);
+    }
 
     /**
-     * @notice Gets the LP Token address of the given pair
-     * @return _lpTokenAddress Address of the LP token
+     * @notice Used to swap tokens to exact tokens
+     * @param _quote The ILBQuoter.Quote struct
+     * @param _amountInMax Amount in max
+     * @param _amountOut Amount out
+     * @param _receiver Address of the receiver
      */
-    function _getLpToken() private view returns (address _lpTokenAddress) {
-        _lpTokenAddress = IJoeFactory(joeRouter.factory()).getPair(address(trancheTokenSr), address(trancheTokenJr));
-    }
+    function _swapToExact(ILBQuoter.Quote memory _quote, uint256 _amountInMax, uint256 _amountOut, address _receiver)
+        internal
+    {
+        IERC20Metadata(_quote.route[0]).safeIncreaseAllowance(address(lbRouter), _amountInMax);
 
-    function getLpToken() public view returns (address) {
-        return _getLpToken();
+        ILBRouter.Path memory _route = ILBRouter.Path(_quote.binSteps, _quote.versions, _quote.route);
+
+        lbRouter.swapTokensForExactTokens(_amountOut, _amountInMax, _route, _receiver, block.timestamp + 1);
     }
 }

@@ -14,7 +14,7 @@ import "../../common/yield-sources/GMXYieldSourceHarness.sol";
 
 import "../../common/BaseTestSetup.sol";
 
-contract GMXYieldSourceForkTest is BaseTestSetup {
+contract GMXYieldSource_IntegrationTest is BaseTestSetup {
     /// System under test
     GMXYieldSourceHarness internal sut;
 
@@ -38,7 +38,7 @@ contract GMXYieldSourceForkTest is BaseTestSetup {
     event RewardsRecompounded();
 
     function setUp() public virtual override {
-        vm.createSelectFork("https://api.avax.network/ext/bc/C/rpc", 27503190);
+        vm.createSelectFork(vm.envString("MAINNET_RPC"), 27503190);
         super.setUp();
     }
 
@@ -100,10 +100,29 @@ contract GMXYieldSourceForkTest is BaseTestSetup {
 
     function testSupplyTokensGMX_ShouldEmitTokensSuppliedEvent() public {
         console.log("should emit TokensSupplied event with the correct params");
+        address tokenA = address(wavax);
+        address tokenB = address(usdc);
+        address caller = address(mockProduct);
+
+        uint256 tokenAToSupply = 10e18;
+        uint256 tokenAPrice = getPrice(tokenA);
+        uint256 tokenBRatePerTokenA = ((tokenAPrice * 1e18) / getPrice(tokenB));
+        uint256 tokenBToSupply = (tokenAToSupply * tokenBRatePerTokenA) / 1e18;
+        uint256 tokenADecimals = IERC20Metadata(tokenA).decimals();
+        uint256 tokenBDecimals = IERC20Metadata(tokenB).decimals();
+        uint256 tokenAToSupplyInTokenDecimals = Helpers.weiToTokenDecimals(tokenADecimals, tokenAToSupply);
+        uint256 tokenBToSupplyInTokenDecimals = Helpers.weiToTokenDecimals(tokenBDecimals, tokenBToSupply);
+        /// This is required as YieldSource contract uses `transferFrom()` for `supplyTokens()`
+        deal(tokenA, address(caller), 100e18);
+        deal(tokenB, address(caller), 100e18);
+        vm.startPrank(caller);
+        IERC20(tokenA).approve(address(sut), 100e18);
+        IERC20(tokenB).approve(address(sut), 100e18);
 
         vm.expectEmit(true, true, true, true, address(sut));
-        emit TokensSupplied(100000000000000000000, 1578131336000000000000, 4196633397279529767306);
-        _simulateSupply(address(wavax), address(usdc), sut, mockProduct);
+        emit TokensSupplied(10000000000000000000, 157813133000000000000, 419663338395605123850);
+        sut.supplyTokens(tokenAToSupplyInTokenDecimals, tokenBToSupplyInTokenDecimals);
+        vm.stopPrank();
     }
 
     function testSupplyTokensGMX_RevertWhenLocalPaused() public {
@@ -601,7 +620,7 @@ contract GMXYieldSourceForkTest is BaseTestSetup {
     }
 
     /*//////////////////////////////////////////////////////////////
-                        HELPER METHDOS
+                        HELPER METHODS
     //////////////////////////////////////////////////////////////*/
     function _simulateSupply(address tokenA, address tokenB, GMXYieldSourceHarness _sut, address caller) internal {
         uint256 tokenADecimals = IERC20Metadata(tokenA).decimals();
