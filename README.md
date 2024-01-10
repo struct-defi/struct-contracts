@@ -56,8 +56,8 @@ When the product enters the WITHDRAWN state, users can withdraw their funds and 
 
 
 #### TraderJoe AutoPools
-* [FEYAutoPoolProduct](https://github.com/struct-defi/struct-contracts/blob/develop/contracts/protocol/products/autopools/FEYAutoPoolProduct.sol)
-* [FEYAutoPoolFactory](https://github.com/struct-defi/struct-contracts/blob/develop/contracts/protocol/products/autopools/FEYAutoPoolProductFactory.sol)
+* [FEYAutoPoolProduct](https://github.com/struct-defi/struct-contracts/blob/main/contracts/protocol/products/autopool/FEYAutoPoolProduct.sol)
+* [FEYAutoPoolFactory](https://github.com/struct-defi/struct-contracts/blob/main/contracts/protocol/products/autopool/FEYAutoPoolProductFactory.sol)
 
 
 #### GMX V1
