@@ -1,4 +1,4 @@
-# Struct Protocol  •  ![Unit Tests](https://github.com/struct-defi/struct-core/actions/workflows/tests-unit.yml/badge.svg) [![codecov](https://codecov.io/gh/struct-defi/struct-core/branch/develop/graph/badge.svg?token=0MAMOSBMKI)](https://codecov.io/gh/struct-defi/struct-core) [![built-with foundry](https://img.shields.io/badge/built%20with-Foundry-3677FF)](https://book.getfoundry.sh/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# Struct Protocol  • [![Tests](https://github.com/struct-defi/struct-contracts/actions/workflows/foundry-tests.yml/badge.svg)](https://github.com/struct-defi/struct-contracts/actions/workflows/foundry-tests.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![built-with foundry](https://img.shields.io/badge/built%20with-Foundry-3677FF)](https://book.getfoundry.sh/) 
 
 [![Website](https://img.shields.io/badge/website-000000?style=for-the-badge&logo=CodeSandbox&logoColor=white)](https://struct.fi/)  [![Discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/invite/MHMacHCFZp)  [![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/structfinance)
 
@@ -56,8 +56,8 @@ When the product enters the WITHDRAWN state, users can withdraw their funds and 
 
 
 #### TraderJoe AutoPools
-* [FEYAutoPoolProduct](https://github.com/struct-defi/struct-contracts/blob/develop/contracts/protocol/products/autopools/FEYAutoPoolProduct.sol)
-* [FEYAutoPoolFactory](https://github.com/struct-defi/struct-contracts/blob/develop/contracts/protocol/products/autopools/FEYAutoPoolProductFactory.sol)
+* [FEYAutoPoolProduct](https://github.com/struct-defi/struct-contracts/blob/main/contracts/protocol/products/autopool/FEYAutoPoolProduct.sol)
+* [FEYAutoPoolFactory](https://github.com/struct-defi/struct-contracts/blob/main/contracts/protocol/products/autopool/FEYAutoPoolProductFactory.sol)
 
 
 #### GMX V1
